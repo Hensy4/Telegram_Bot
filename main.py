@@ -118,21 +118,7 @@ async def handle_weather(message: Message):
         return
         
     city = args[1]
-    days = 1
     
-
-    # Проверяем, указано ли количество дней
-    if len(args) > 2:
-        try:
-            days = int(args[2])
-            if days < 1:
-                await message.answer("❌ Дней должно быть больше 0!")
-                return
-            if days > 7:
-                await message.answer("❌ Максимум 7 дней!")
-                return
-        except ValueError:
-            await message.answer("Укажи число дней, например: /weather Москва 5")
     try:
         # Подключаемся к API погоды
         async with python_weather.Client() as client:
@@ -141,33 +127,18 @@ async def handle_weather(message: Message):
             if weather is None:
                 await message.answer(f"❌ Город '{city}' не найден!")
                 return
-        # Прогноз на текущий день
-        if days == 1:
-            description_ru = weather_translations.get(weather.description, weather.description)
-            await message.answer(
-                f"🌤 **Погода в {city}:**\n"
-                f"🌡 Температура: {weather.temperature}°C\n"
-                f"☁️ Погода: {description_ru}\n"
-                f"💧 Влажность: {weather.humidity}%\n"
-                f"💨 Ветер: {weather.wind_speed} км/ч"
-            )
-        else:
-            # Прогноз на несколько дней
-            forecast = f"📅 **Прогноз погоды в {city} на {days} дней**\n\n"
+
+        description_ru = weather_translations.get(weather.description, weather.description)
             
-            daily_forecasts = []
-            for i, daily in enumerate(weather.daily_forecasts[:days]):
-                date = daily.date.strftime("%d.%m")
-                descrip_ru = weather_translations.get(daily.description, daily.description)
-            
-                forecast += (
-                    f"📆 {date}:\n"
-                    f"🌡 Температура: {daily.temperature}°C\n"
-                    f"☁️ {descrip_ru}\n"
-                    f"💧 Влажность: {daily.humidity}%\n"
-                    f"💨 Ветер: {daily.wind_speed} км/ч"
-                )
-            await message.answer(forecast)
+            # Отправляем текущую погоду
+        await message.answer(
+            f"🌤 **Погода в {city}:**\n"
+            f"🌡 Температура: {weather.temperature}°C\n"
+            f"☁️ Погода: {description_ru}\n"
+            f"💧 Влажность: {weather.humidity}%\n"
+            f"💨 Ветер: {weather.wind_speed} км/ч"
+        )
+
             
     except Exception as e:
         await message.answer(f"❌ Ошибка: не удалось получить погоду. Попробуй позже.")
