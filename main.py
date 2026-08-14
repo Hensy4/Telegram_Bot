@@ -1,6 +1,7 @@
 import random
 import string
 import asyncio
+import python_weather
 from aiogram import Bot, Dispatcher
 from aiogram.types import Message
 from aiogram.filters import Command
@@ -61,11 +62,81 @@ async def handle_help(message: Message):
         "/start - Приветствие\n"
         "/help - Список команд\n"
         "/password [число] — любая длина (по умолчанию 8)\n"
-        
+        "/weather [город]"
     )
     
 # ====================
 # help comands
+
+# ====================
+# weather start
+
+weather_translations = {
+    'Partly Cloudy': 'Переменная облачность',
+    'Clear': 'Ясно',
+    'Sunny': 'Солнечно',
+    'Cloudy': 'Облачно',
+    'Overcast': 'Пасмурно',
+    'Rain': 'Дождь',
+    'Light Rain': 'Небольшой дождь',
+    'Moderate Rain': 'Умеренный дождь',
+    'Heavy Rain': 'Сильный дождь',
+    'Light rain shower': 'Легкий дождь',
+    'Rain shower': 'Дождь',
+    'Snow': 'Снег',
+    'Light Snow': 'Небольшой снег',
+    'Heavy Snow': 'Сильный снег',
+    'Thunderstorm': 'Гроза',
+    'Fog': 'Туман',
+    'Mist': 'Дымка',
+    'Drizzle': 'Морось',
+    'Showers': 'Ливень',
+    'Patchy rain': 'Местами дождь',
+    'Patchy snow': 'Местами снег',
+    'Patchy sleet': 'Местами мокрый снег',
+    'Blizzard': 'Метель',
+    'Freezing rain': 'Ледяной дождь',
+    'Hail': 'Град',
+    'Fair': 'Ясно',
+    'Mostly Cloudy': 'Облачно с прояснениями',
+    'Partly cloudy': 'Переменная облачность',
+    'Scattered clouds': 'Рассеянные облака',
+    'Broken clouds': 'Разорванная облачность',
+    'Few clouds': 'Малооблачно',
+    'Patchy rain nearby': 'Местами дождь поблизости'
+}
+
+@dp.message(Command("weather"))
+async def handle_weather(message: Message):
+    args = message.text.split()
+    
+    if len(args) < 2:
+        await message.answer("❌ Укажи город")
+        
+        
+    city = args[1]
+    
+    try:
+        async with python_weather.Client() as client:
+            weather = await client.get(city)
+            
+            if weather is None:
+                await message.answer(f"❌ Город '{city}' не найден!")
+
+        description_ru = weather_translations.get(weather.description, weather.description)
+        await message.answer(
+            f"🌤 **Погода в {city}:**\n"
+            f"🌡 Температура: {weather.temperature}°C\n"
+            f"☁️ Погода: {description_ru}\n"
+            f"💧 Влажность: {weather.humidity}%\n"
+            f"💨 Ветер: {weather.wind_speed} км/ч"
+        )
+    except Exception as e:
+        await message.answer(f"❌ Ошибка: не удалось получить погоду. Попробуй позже.")
+
+
+# ====================
+# weather stop
 
 async def main():
     await dp.start_polling(bot)
