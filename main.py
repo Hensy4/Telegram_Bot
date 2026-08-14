@@ -16,8 +16,21 @@ dp = Dispatcher()
 # ====================
 # password start
 
-
-
+@dp.message(Command("dice"))
+async def handle_dice(message: Message):
+    randNum = random.randint(1,6)
+    
+    dice_emoji = {
+        1: "⚀",
+        2: "⚁", 
+        3: "⚂",
+        4: "⚃",
+        5: "⚄",
+        6: "⚅"
+    }
+    
+    await message.answer(f"🎲 Вам выпал кубик: {dice_emoji[randNum]} ({randNum})")
+    
 @dp.message(Command("password"))
 async def handle_password(message: Message):
     args = message.text.split()
