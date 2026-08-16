@@ -12,6 +12,27 @@ BOT_TOKEN = "8992122596:AAFZkWeWXeIqGRG6U_MwDspVjTQ1n7ES0Hc"
 bot = Bot(token=BOT_TOKEN)
 dp = Dispatcher()
 
+# ====================
+# dice start
+
+@dp.message(Command("dice"))
+async def handle_dice(message: Message):
+    randNum = random.randint(1,6)
+    
+    dice_emoji = {
+        1: "⚀",
+        2: "⚁", 
+        3: "⚂",
+        4: "⚃",
+        5: "⚄",
+        6: "⚅"
+    }
+    
+    await message.answer(f"🎲 Вам выпал кубик: {dice_emoji[randNum]} ({randNum})")
+
+# ====================
+# dice stop
+
 
 # ====================
 # password start
