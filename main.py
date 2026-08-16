@@ -64,7 +64,7 @@ async def handle_password(message: Message):
 
 @dp.message(Command("start"))
 async def handle_start(message: Message):
-    await message.answer("Привет! Я бот-помощник 👋")
+    await message.answer("Привет! Я бот-помощник👋")
     
 # ====================
 # help comands
