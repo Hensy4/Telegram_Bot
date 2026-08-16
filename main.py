@@ -138,7 +138,7 @@ async def handle_weather(message: Message):
             weather = await client.get(city)
             
             if weather is None:
-                await message.answer(f"❌ Город '{city}' не найден!")
+                await message.answer(f"❌ Город '{city}' не найден!!!")
                 return
 
         description_ru = weather_translations.get(weather.description, weather.description)
