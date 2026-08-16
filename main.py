@@ -5,6 +5,7 @@ import python_weather
 from aiogram import Bot, Dispatcher
 from aiogram.types import Message
 from aiogram.filters import Command
+from aiogram.types import ReplyKeyboardMarkup, KeyboardButton
 
 BOT_TOKEN = "8992122596:AAFZkWeWXeIqGRG6U_MwDspVjTQ1n7ES0Hc"
 
@@ -13,12 +14,62 @@ bot = Bot(token=BOT_TOKEN)
 dp = Dispatcher()
 
 
+
 # ====================
-# password start
+# button strt
+@dp.message()
+async def handle_buttons(message: Message):
+    text = message.text
+    
+    if text == "🔐 Пароль":
+        password = generate_password(8)
+        await message.answer(f"🔐 Твой пароль: {password}")
+
+    elif text == "🌤 Погода":
+        await message.answer("🌤 Напиши город")
+        
+    elif text == "🎲 Кубик":
+        rand_num = random.randint(1, 6)
+        dice_emoji = {1: "⚀", 2: "⚁", 3: "⚂", 4: "⚃", 5: "⚄", 6: "⚅"}
+        await message.answer(f"🎲 Тебе выпало: {dice_emoji[rand_num]} ({rand_num})")
+        
+    elif text == "ℹ️ Помощь":
+        await message.answer(
+            "📚 Команды:\n"
+            "/start - Приветствие\n"
+            "/help - Список команд\n"
+            "/password - Пароль\n"
+            "/weather - Погода\n"
+            "/dice - Кубик"
+        )
+        
+        
+# ====================
+# button stop
+
+# ====================
+# keyboard start
+
+keyboard = ReplyKeyboardMarkup(
+    keyboard=[
+        [
+            KeyboardButton(text="🔐 Пароль"),
+            KeyboardButton(text="🌤 Погода")
+        ],
+        [
+            KeyboardButton(text="🎲 Кубик"),
+            KeyboardButton(text="ℹ️ Помощь")
+        ]
+    ],
+    resize_keyboard=True
+)
+
+# ====================
+# keyboard stop
 
 @dp.message(Command("dice"))
 async def handle_dice(message: Message):
-    randNum = random.randint(1,6)
+    rand_num = random.randint(1,6)
     
     dice_emoji = {
         1: "⚀",
@@ -29,7 +80,18 @@ async def handle_dice(message: Message):
         6: "⚅"
     }
     
-    await message.answer(f"🎲 Вам выпал кубик: {dice_emoji[randNum]} ({randNum})")
+    await message.answer(f"🎲 Вам выпал кубик: {dice_emoji[rand_num]} ({rand_num})")
+    
+# ====================
+# password start
+
+
+
+# Функция генерации пароля
+def generate_password(length):
+    all_chars = string.digits + string.ascii_lowercase + string.ascii_uppercase + "!@#$%^&*()_+-="
+    return ''.join(random.choice(all_chars) for _ in range(length))
+        
     
 @dp.message(Command("password"))
 async def handle_password(message: Message):
@@ -50,13 +112,7 @@ async def handle_password(message: Message):
             await message.answer("Укажи число, например: /password 20")
             return
         
-    # Функция генерации пароля
-    def generate(length):
-        all_chars = string.digits + string.ascii_lowercase + string.ascii_uppercase + "!@#$%^&*()_+-="
-        _password = ''.join(random.choice(all_chars) for _ in range(length))
-        return _password
-    
-    await message.answer(f"Твой пароль: {generate(length)}")
+    await message.answer(f"Твой пароль: {generate_password(length)}")
 
 # ====================
 # password stop 
@@ -64,7 +120,10 @@ async def handle_password(message: Message):
 
 @dp.message(Command("start"))
 async def handle_start(message: Message):
-    await message.answer("Привет! Я бот-помощник 👋")
+    await message.answer(
+        "Привет! Я бот-помощник 👋",
+        reply_markup=keyboard
+    )
     
 # ====================
 # help comands
